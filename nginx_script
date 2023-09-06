@@ -1,0 +1,42 @@
+#!/bin/bash
+
+yum update;
+yum install -y wget;
+yum install -y nano;
+yum install -y rsync;
+
+wget https://github.com/prometheus/node_exporter/releases/download/v1.6.0/node_exporter-1.6.0.linux-amd64.tar.gz;
+tar xf node_exporter-1.6.0.linux-amd64.tar.gz
+useradd --no-create-home --user-group --shell=/usr/sbin/nologin node_exporter
+sudo rsync -abvuP  --chown=node_exporter:node_exporter /home/kostya/node_exporter-1.6.0.linux-amd64/node_exporter /usr/local/bin/
+wget -m --user=back --password=backup ftp://192.168.88.60/node_exporter.service
+rsync -advuP /home/kostya/192.168.88.60/node_exporter.service /etc/systemd/system
+systemctl daemon-reload
+systemctl start node_exporter
+systemctl enable node_exporter
+
+wget https://github.com/prometheus/node_exporter/releases/download/v1.6.0/node_exporter-1.6.0.linux-amd64.tar.gz;
+tar xf node_exporter-1.6.0.linux-amd64.tar.gz
+useradd --no-create-home --user-group --shell=/usr/sbin/nologin node_exporter
+rsync -abvuP  --chown=node_exporter:node_exporter /home/kostya/node_exporter-1.6.0.linux-amd64/node_exporter /usr/local/bin/
+wget -m --user=back --password=backup ftp://192.168.88.60/node_exporter.service
+rsync -advuP /home/kostya/192.168.88.60/node_exporter.service /etc/systemd/system
+systemctl daemon-reload
+systemctl start node_exporter
+systemctl enable node_exporter
+
+yum install epel-release;
+
+yum install nginx
+systemctl start nginx
+systemctl enable nginx
+
+sed -c -i "s/\SELINUX=.*/SELINUX=disabled/" /etc/sysconfig/selinux
+
+systemctl stop firewalld;
+systemctl disable firewalld;
+
+wget -m --user=back --password=backup ftp://192.168.88.60/nginx.conf
+
+mv /home/kostya/192.168.88.60/nginx.conf /etc/nginx/nginx.conf
+
