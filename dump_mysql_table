@@ -1,0 +1,14 @@
+#!/bin/bash
+
+dbmask='db_drupal'
+MYSQL="mysql --skip-column-names "
+for dbname in `$MYSQL -e "SHOW DATABASES LIKE '%$dbmask%'"`;
+do
+	echo 'working with db:'$dbname
+	mkdir -p $dbname;
+	for tablename in `$MYSQL -e "USE $dbname; SHOW TABLES;"`
+	do
+		echo 'current table is:'$tablename
+		/usr/bin/mysqldump --add-drop-table --add-locks --create-options --disable-keys --extended-insert --single-transaction --quick --set-charset --events --triggers --master-data=2 $dbname $tablename | gzip -1 > $dbname/$tablename.gz;
+	done
+done
