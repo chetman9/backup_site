@@ -1,0 +1,29 @@
+#!/bin/bash
+
+sudo systemctl stop firewalld
+sudo systemctl disable firewalld
+wget https://github.com/prometheus/prometheus/releases/download/v2.37.9/prometheus-2.37.9.linux-amd64.tar.gz
+tar -xf prometheus-2.37.9.linux-amd64.tar.gz
+useradd --no-create-home --shell /usr/bin/false prometheus
+mkdir -m 755 {/etc/,/var/lib/}prometheus
+rsync --chown=prometheus:prometheus -arvP /home/kostya/prometheus-2.37.9.linux-amd64/consoles /etc/prometheus/
+rsync --chown=prometheus:prometheus -arvP /home/kostya/prometheus-2.37.9.linux-amd64/console_libraries /etc/prometheus/
+rsync --chown=prometheus:prometheus -arvP /home/kostya/prometheus-2.37.9.linux-amd64/promtool /usr/local/bin/
+rsync --chown=prometheus:prometheus -arvP /home/kostya/prometheus-2.37.9.linux-amd64/prometheus /usr/local/bin/
+chown -v -R prometheus: /var/lib/prometheus/
+wget -m --user=back --password=backup ftp://192.168.88.60/prometheus.service
+wget -m --user=back --password=backup ftp://192.168.88.60/prometheus.yml
+rsync -advuP /home/kostya/192.168.88.60/prometheus.service /etc/systemd/system
+cp -v /home/kostya/192.168.88.60/prometheus.yml /etc/prometheus/
+systemctl daemon-reload
+systemctl start prometheus
+systemctl enable prometheus
+wget https://github.com/prometheus/node_exporter/releases/download/v1.6.0/node_exporter-1.6.0.linux-amd64.tar.gz;
+tar xf node_exporter-1.6.0.linux-amd64.tar.gz
+useradd --no-create-home --user-group --shell=/usr/sbin/nologin node_exporter
+rsync -abvuP  --chown=node_exporter:node_exporter /home/kostya/node_exporter-1.6.0.linux-amd64/node_exporter /usr/local/bin/
+wget -m --user=back --password=backup ftp://192.168.88.60/node_exporter.service
+rsync -advuP /home/kostya/192.168.88.60/node_exporter.service /etc/systemd/system
+systemctl daemon-reload
+systemctl start node_exporter
+systemctl enable node_exporter
