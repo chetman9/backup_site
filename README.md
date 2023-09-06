@@ -13,7 +13,7 @@ backup_site
 1. Восстановить базу данных master mysql db_drupal 192.168.88.50, запустить скрипт master
     При запуске скрипта - master установится mysql_secure_installation, Задать пароль Qwerty123!!!
     Создать пользователя для синхронизации мастер слейва
-    CREATE USER repl@'%' IDENTIFIED WITH 'caching_sha2_password' BY 'oTUSlave#2020';
+    CREATE USER repl@'%' IDENTIFIED WITH 'caching_sha2_password' BY 'Slave!23a';
     GRANT REPLICATION SLAVE ON *.* TO repl@'%';
 2. Восстановить базу данных slave mysql db_drupal 192.168.88.51 запустить скрипт slave
     При запуске скрипта - master установится mysql_secure_installation, Задать пароль Qwerty123!!!
