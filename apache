@@ -1,0 +1,44 @@
+#!/bin/bash
+
+yum -y update;
+yum install -y wget;
+yum install -y nano;
+yum install -y rsync;
+yum install -y httpd;
+
+wget https://github.com/prometheus/node_exporter/releases/download/v1.6.0/node_exporter-1.6.0.linux-amd64.tar.gz;
+tar xf node_exporter-1.6.0.linux-amd64.tar.gz
+useradd --no-create-home --user-group --shell=/usr/sbin/nologin node_exporter
+rsync -abvuP  --chown=node_exporter:node_exporter /home/kostya/node_exporter-1.6.0.linux-amd64/node_exporter /usr/local/bin/
+wget -m --user=back --password=backup ftp://192.168.88.60/node_exporter.service
+rsync -advuP /home/kostya/192.168.88.60/node_exporter.service /etc/systemd/system
+systemctl daemon-reload
+systemctl start node_exporter
+systemctl enable node_exporter
+
+yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm;
+yum -y install https://rpms.remirepo.net/enterprise/remi-release-7.rpm;
+yum -y install yum-utils;
+yum-config-manager --enable remi-php81;
+yum update;
+yum install php  php-cli php-fpm php-mysqlnd php-zip php-devel php-gd php-mcrypt php-mbstring php-curl php-xml php-pear php-bcmath php-json;
+
+systemctl start httpd;
+systemctl enable httpd;
+
+systemctl stop firewalld;
+systemctl disable firewalld;
+
+sed -c -i "s/\SELINUX=.*/SELINUX=disabled/" /etc/sysconfig/selinux
+
+wget https://www.drupal.org/download-latest/tar.gz -O drupal.tar.gz
+tar xvf drupal.tar.gz
+mv drupal-*/  /var/www/html/drupal
+
+wget -m --user=back --password=backup ftp://192.168.88.60/drupal.conf  ftp://192.168.88.60/settings.php
+cp 192.168.88.60/drupal.conf /etc/httpd/conf.d/
+cp 192.168.88.60/settings.php /var/www/html/drupal/sites/default/
+
+chown -R apache:apache /var/www/html/drupal
+chmod -R 755 /var/www/html/drupal
+
